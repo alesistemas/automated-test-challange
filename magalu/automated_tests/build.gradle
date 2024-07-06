@@ -1,0 +1,93 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+}
+
+sourceSets {
+    selenium
+}
+
+group 'leaseLoco'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+project.ext {
+    cucumberVersion = '5.6.0'
+}
+
+dependencies {
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation group: 'org.testng', name: 'testng', version: '7.1.0'
+    testImplementation group: 'io.cucumber', name: 'cucumber-testng', version: '4.2.3'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    testImplementation group: 'info.cukes', name: 'cucumber-junit', version: '1.2.6', ext: 'pom'
+    testImplementation group: 'info.cukes', name: 'cucumber-jvm', version: '1.2.6', ext: 'pom'
+    testImplementation 'com.codeborne:phantomjsdriver:1.5.0'
+    testImplementation group: 'info.cukes', name: 'cucumber-core', version: '1.2.6'
+    testImplementation group: 'info.cukes', name: 'cucumber-junit', version: '1.2.6'
+    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.1.2'
+    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '4.1.2'
+    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-firefox-driver', version: '4.1.2'
+    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-server', version: '3.141.59'
+    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-support', version: '4.1.2'
+    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-api', version: '4.1.2'
+    testImplementation group: 'io.cucumber', name: 'cucumber-java', version: cucumberVersion
+    testImplementation group: 'io.cucumber', name: 'cucumber-picocontainer', version: '7.2.3'
+    testImplementation group: 'com.vimalselvam', name: 'cucumber-extentsreport', version: '3.1.1'
+    testImplementation group: 'com.aventstack', name: 'extentreports-cucumber4-adapter', version: '1.0.7'
+    testImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.1'
+    testImplementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    testImplementation group: 'com.vimalselvam', name: 'cucumber-extentsreport', version: '3.1.1'
+    testImplementation group: 'com.aventstack', name: 'extentreports', version: '3.1.1'
+    testImplementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+    testImplementation group: 'io.cucumber', name: 'datatable', version: '1.1.12'
+    testImplementation 'io.cucumber:cucumber-java8:7.5.0'
+    testImplementation 'io.cucumber:cucumber-junit:7.5.0'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.9'
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '2.0.9'
+
+
+    task cucumber() {
+        dependsOn assemble, compileTestJava
+        doLast {
+            javaexec {
+                main = "io.cucumber.core.cli.Main"
+                classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+                args = ['--plugin', 'html:reports/test-report', '--plugin', 'pretty', '--glue', 'com.hmtmcse.tutorial', 'src/test/resources']
+            }
+        }
+    }
+
+    test {
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+        testLogging.showStandardStreams = true
+        systemProperties System.getProperties()
+        reports.junitXml.enabled = false
+        reports.html.enabled = false
+        allprojects {
+            tasks.withType(JavaCompile) {
+                options.compilerArgs << "-Xlint:deprecation"
+            }
+        }
+    }
+    targetCompatibility = JavaVersion.VERSION_1_8;
+
+
+}
